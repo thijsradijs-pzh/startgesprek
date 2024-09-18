@@ -1,0 +1,9 @@
+osm_network/G.graphml
+osm_network/G_e.dbf
+standalone/CBS_100-100_house/downloads
+standalone/CBS_100-100_house/extracts
+standalone/CBS_100-100_house/outputs
+standalone/CBS_100-100_house/clipped.geojson
+standalone/corine_data_landcover/outputs
+standalone/corine_data_landcover/outputs
+H3DataProcessing/cache
