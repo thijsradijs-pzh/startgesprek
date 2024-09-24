@@ -352,6 +352,34 @@ def initialize_session_state(idx):
 # Display introductory text
 def display_intro_text():
     st.markdown("### Fase 1: Geschiktheidsanalyse")
+    st.markdown("""
+
+Welkom bij de **Geschiktheidsanalyse Tool**! Met deze tool kun je locaties vinden die het beste passen bij jouw wensen, op basis van verschillende criteria zoals bevolking, woningen, natuur en economie. De data komt uit databronnen van het CBS (100m vierkants statistieken) en de ESA (Corine Landcover Data).
+
+### Hoe werkt het?
+
+1. **Kies je criteria**:  
+   In de **zijbalk** kies je uit categorieën zoals *Demografie*, *Woningvoorraad*, *Landgebruik en Natuur* en *Economie en Industrie*. Selecteer of je **dichtbij** of juist **ver weg** van bepaalde kenmerken wilt zijn.
+
+2. **Bekijk data op de kaart**:  
+   Klik op **"Visualiseer Dataset"** om een dataset op de kaart te zien.
+
+3. **Voer een analyse uit**:  
+   Klik op **"Bouw Geschiktheidskaart"** om een kaart te maken met gebieden die aan je gekozen criteria voldoen.
+
+4. **Bekijk en sla resultaten op**:  
+   De resultaten worden op de kaart getoond. Ben je tevreden? Sla je selectie op en ga verder naar **Fase 2** voor meer analyses.
+
+### Waarom deze tool gebruiken?
+
+- **Makkelijk in gebruik**: Selecteer eenvoudig de criteria die voor jou belangrijk zijn.
+- **Visuele inzichten**: Bekijk de resultaten direct op een kaart.
+- **Datagedreven keuzes**: Neem beslissingen gebaseerd op duidelijke data.
+
+Veel succes met je analyse!
+""")
+
+    
     st.markdown(
         "Gebruik de dropdowns om verschillende criteria te selecteren en te analyseren.",
         unsafe_allow_html=True

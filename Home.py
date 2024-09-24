@@ -3,10 +3,10 @@ import streamlit as st
 def main():
     st.set_page_config(page_title="Begin", layout="wide", initial_sidebar_state="expanded")
 
-    st.title(":seedling: Provincie Zuid-Holland Interactieve Tool (Met Neppe Data)")
+    st.title(":seedling: Multi Criteria analyse, EenInteractieve Tool")
     
     st.markdown(":bulb: Over de tool...")
-    st.markdown("Voor de duidelijkheid: deze tool is bedoelt als startgesprek voor verschillende stakeholders, niet als leidend. De tool bestaat uit een ***tweestaps*** leerproces om gebruikers te betrekken bij het leren over de voordelen en afwegingen van een bepaald scenario.")
+    st.markdown("Voor de duidelijkheid: deze tool is bedoelt als startgesprek voor verschillende stakeholders, niet als leidend in besluitvorming. De tool bestaat uit een ***tweestaps*** leerproces om gebruikers te betrekken bij het leren over de voordelen en afwegingen van een bepaald scenario.")
 
     st.markdown(":compass: Hoe de tool te gebruiken...")
     st.markdown("**Fase 1: Geschiktheidsanalyse**")
