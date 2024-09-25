@@ -172,7 +172,7 @@ def generate_pydeck(df=None, selected_hexagons=None, view_state=VIEW_STATE):
     return pdk.Deck(
         initial_view_state=view_state,
         layers=layers,
-        tooltip={"text": "Geschikt"}
+        tooltip={"html": "<b>Hexagon:</b> {hex9}<br/>"}
     )
 
 # Helper function to clean dataset names
