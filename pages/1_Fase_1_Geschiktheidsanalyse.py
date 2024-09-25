@@ -71,9 +71,9 @@ def fuzzify_each_layer(df_list, fuzz_type='close', colormap_name='magma'):
         
         # Apply fuzzification depending on the fuzz_type
         if fuzz_type == "close":
-            fuzzified_array = np.maximum(0, 1 - (df_array - df_array.min()) / range_diff)
-        else:  # fuzz_type == "far"
             fuzzified_array = np.maximum(0, (df_array - df_array.min()) / range_diff)
+        else:  # fuzz_type == "far"
+            fuzzified_array = np.maximum(0, 1 - (df_array - df_array.min()) / range_diff)
         
         # Create a new DataFrame for the fuzzified result
         fuzzified_df = df.copy()
@@ -165,7 +165,7 @@ def generate_pydeck(df=None, selected_hexagons=None, view_state=VIEW_STATE):
             extruded=False,
             opacity=0.9,
             get_hexagon="hex9",
-            get_fill_color=[255, 0, 0],  # Red color for selected hexagons
+            get_fill_color=[142, 152, 100],  # Red color for selected hexagons
         )
         layers.append(selected_hex_layer)
 
@@ -333,7 +333,6 @@ def perform_suitability_analysis_on_stack(dataframes, idx):
         if 'all_loi' in st.session_state and not st.session_state.all_loi.empty:
             st.session_state.loi = st.session_state.all_loi
             st.success("Resultaten opgeslagen. U wordt doorgestuurd naar Fase 2 voor de analyse.")
-            st.experimental_set_query_params(page="Fase 2 Beleid Verkenner")
             st.switch_page("pages/2_Fase_2_Beleidsverkenner.py")
         else:
             st.error("Geen resultaten om op te slaan. Voer eerst de geschiktheidsanalyse uit.")
@@ -354,7 +353,7 @@ def display_intro_text():
     st.markdown("### Fase 1: Geschiktheidsanalyse")
     st.markdown("""
 
-Welkom bij de **Geschiktheidsanalyse Tool**! Met deze tool kun je locaties vinden die het beste passen bij jouw wensen, op basis van verschillende criteria zoals bevolking, woningen, natuur en economie. De data komt uit databronnen van het CBS (100m vierkants statistieken) en de ESA (Corine Landcover Data).
+Welkom bij de **Geschiktheidsanalyse Tool**! Met deze tool kun je locaties vinden die het beste passen bij jouw wensen, op basis van verschillende criteria zoals bevolking, woningen, natuur en economie. De data komt uit databronnen van het CBS (Kaart van 100 meter bij 100 meter met statistieken) en de ESA (Corine Landcover Data).
 
 ### Hoe werkt het?
 
@@ -420,7 +419,7 @@ def main():
     st.set_page_config(page_title="Geschiktheids Analyse", layout="wide")
 
     # Load data
-    idx = load_gdf('./app_data/h3_pzh_polygons.shp')
+    idx = load_gdf('./app_data/h3_pzh_polygons.geojson')
     if idx is None:
         st.stop()
     all_hexagons = idx.index.tolist()
