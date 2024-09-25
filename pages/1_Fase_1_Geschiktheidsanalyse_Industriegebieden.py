@@ -30,6 +30,9 @@ def load_selected_csvs(folder_path, selected_csvs, all_hexagons):
                 if 'hex9' not in df.columns:
                     st.error(f"'hex9' column not found in {file_name}")
                     continue
+                if 'value' not in df.columns:
+                    st.error(f"'value' column not found in {file_name}")
+                    continue
                 df = df.set_index('hex9')
                 # Reindex to include all hexagons, fill missing values with zero
                 df = df.reindex(all_hexagons, fill_value=0)
@@ -67,13 +70,14 @@ def fuzzify_each_layer(df_list, fuzz_type='close', colormap_name='magma'):
         # Avoid division by zero
         range_diff = df_array.max() - df_array.min()
         if range_diff == 0:
-            range_diff = 1
-        
-        # Apply fuzzification depending on the fuzz_type
-        if fuzz_type == "close":
-            fuzzified_array = np.maximum(0, (df_array - df_array.min()) / range_diff)
-        else:  # fuzz_type == "far"
-            fuzzified_array = np.maximum(0, 1 - (df_array - df_array.min()) / range_diff)
+            # Assign constant fuzzified value
+            fuzzified_array = np.ones_like(df_array)
+        else:
+            # Apply fuzzification depending on the fuzz_type
+            if fuzz_type == "close":
+                fuzzified_array = np.maximum(0, (df_array - df_array.min()) / range_diff)
+            else:  # fuzz_type == "far"
+                fuzzified_array = np.maximum(0, 1 - (df_array - df_array.min()) / range_diff)
         
         # Create a new DataFrame for the fuzzified result
         fuzzified_df = df.copy()
@@ -128,7 +132,21 @@ def perform_spatial_analysis_on_stack(stacked_df, idx, w, g, seed=42):
 
     significant_locations = stacked_df[(lisa.q == 1) & (lisa.p_sim < 0.01)].index
 
-    return stacked_df.loc[significant_locations]
+    significant_df = stacked_df.loc[significant_locations]
+
+        # Further filter by 'fuzzy_sum' (e.g., top 10% highest values)
+    if not significant_df.empty:
+        fuzzy_sum_threshold = significant_df['fuzzy_sum'].quantile(0.9)  # Adjust percentile as needed
+        most_relevant_locations = significant_df[significant_df['fuzzy_sum'] >= fuzzy_sum_threshold]
+    else:
+        st.warning("No significant locations found after applying filters.")
+        return pd.DataFrame()
+
+    # Optionally, limit the number of results to top N
+    # top_n = 100
+    # most_relevant_locations = most_relevant_locations.sort_values(by='fuzzy_sum', ascending=False).head(top_n)
+
+    return most_relevant_locations
 
 # Generate pydeck visualization - Modified to visualize selected hexagons and full layer
 @st.cache_resource
@@ -151,7 +169,7 @@ def generate_pydeck(df=None, selected_hexagons=None, view_state=VIEW_STATE):
         )
         layers.append(full_hex_layer)
 
-    # Add a layer for selected hexagons, highlighting them in red
+    # Add a layer for selected hexagons, highlighting them
     if selected_hexagons is not None and not selected_hexagons.empty:
         selected_hex_layer = pdk.Layer(
             "H3HexagonLayer",
@@ -162,20 +180,62 @@ def generate_pydeck(df=None, selected_hexagons=None, view_state=VIEW_STATE):
             extruded=False,
             opacity=0.9,
             get_hexagon="hex9",
-            get_fill_color=[142, 152, 100],  # Red color for selected hexagons
+            get_fill_color=[255, 0, 0],  # Red color for selected hexagons
         )
         layers.append(selected_hex_layer)
 
     return pdk.Deck(
         initial_view_state=view_state,
         layers=layers,
-        tooltip={"text": "Geschikt"}
+        tooltip={"html": "<b>Hexagon:</b> {hex9}<br/><b>Value:</b> {value}"}
     )
 
 # Helper function to clean dataset names
 def clean_dataset_name(name):
     """Replaces underscores with spaces and capitalizes for cleaner display."""
-    return name.replace('_', ' ').capitalize()
+    return ' '.join(word.capitalize() for word in name.replace('_', ' ').split())
+
+# Update layer based on selected variables (non-fuzzified)
+def update_layer(selected_variable, all_dataframes):
+    """Updates the visualization layer with selected variable."""
+    df = all_dataframes[selected_variable].reset_index()
+    if 'value' not in df.columns:
+        st.error(f"'value' column not found in dataset {selected_variable}")
+        return pd.DataFrame()
+    hex_df = df[['hex9', 'value']].copy()
+    # Apply colormap
+    apply_color_mapping(hex_df, 'value', COLORMAP)
+    return hex_df
+
+# Display all datasets immediately below the introduction in a grid layout
+def display_all_datasets(dataframes):
+    # Create a dictionary to map clean names to original names
+    clean_names_map = {clean_dataset_name(name): name for name in dataframes.keys()}
+    
+    st.header("Dataset Visualisaties")
+    
+    clean_dataset_names = [clean_dataset_name(ds) for ds in dataframes.keys()]
+    
+    # Determine the number of columns per row
+    num_columns = 3
+    # Calculate the number of rows needed
+    num_rows = (len(clean_dataset_names) + num_columns - 1) // num_columns
+    
+    dataset_index = 0  # Index to keep track of datasets
+    for _ in range(num_rows):
+        cols = st.columns(num_columns)
+        for i in range(num_columns):
+            if dataset_index < len(clean_dataset_names):
+                clean_name = clean_dataset_names[dataset_index]
+                selected_variable = clean_names_map[clean_name]
+                updated_layer = update_layer(selected_variable, dataframes)
+                with cols[i]:
+                    st.subheader(clean_name)
+                    if not updated_layer.empty:
+                        st.pydeck_chart(generate_pydeck(updated_layer), use_container_width=True)
+                    else:
+                        st.warning(f"Geen data beschikbaar voor {clean_name}")
+                dataset_index += 1
 
 # Perform suitability analysis and update layers for stacked fuzzified layers
 def perform_suitability_analysis_on_stack(dataframes, idx):
@@ -183,7 +243,7 @@ def perform_suitability_analysis_on_stack(dataframes, idx):
     clean_names_map = {clean_dataset_name(name): name for name in dataframes.keys()}
 
     with st.sidebar.form("suitability_analysis_form"):
-        st.header("Selecteer Criteria voor Nieuwbouw Projecten")
+        st.header("Selecteer Criteria voor Industriegebieden")
 
         # Combine all dataset names into a single list
         clean_dataset_names = [clean_dataset_name(ds) for ds in dataframes.keys()]
@@ -274,9 +334,9 @@ def initialize_session_state(idx):
 
 # Display introductory text
 def display_intro_text():
-    st.markdown("### Geschiktheidsanalyse voor Nieuwbouw Projecten")
+    st.markdown("### Geschiktheidsanalyse voor Industriegebieden")
     st.markdown("""
-Welkom bij de **Geschiktheidsanalyse voor Nieuwbouw Projecten**! Met deze tool kun je locaties vinden die het meest geschikt zijn voor nieuwe bouwprojecten, gebaseerd op verschillende criteria.
+Welkom bij de **Geschiktheidsanalyse voor Industriegebieden**! Met deze tool kun je locaties vinden die het meest geschikt zijn voor nieuwe bouwprojecten, gebaseerd op verschillende criteria.
 
 ### Hoe werkt het?
 
@@ -292,34 +352,9 @@ Welkom bij de **Geschiktheidsanalyse voor Nieuwbouw Projecten**! Met deze tool k
 Veel succes met je analyse!
 """)
 
-# Display dropdown for CSV selection and visualize the selected CSV
-def display_csv_selection(dataframes):
-    # Create a dictionary to map clean names to original names
-    clean_names_map = {clean_dataset_name(name): name for name in dataframes.keys()}
-
-    with st.expander("Visualiseer Dataset"):
-        clean_dataset_names = [clean_dataset_name(ds) for ds in dataframes.keys()]
-        selected_variable_clean = st.selectbox("Selecteer dataset om te visualiseren", [''] + clean_dataset_names)
-        if selected_variable_clean and selected_variable_clean != '':
-            selected_variable = clean_names_map[selected_variable_clean]
-            updated_layer = update_layer(selected_variable, dataframes)
-            st.pydeck_chart(generate_pydeck(updated_layer), use_container_width=True)
-
-# Update layer based on selected variables (non-fuzzified)
-def update_layer(selected_variable, all_dataframes):
-    """Updates the visualization layer with selected variable."""
-    df = all_dataframes[selected_variable].reset_index()
-    if 'value' not in df.columns:
-        st.error(f"'value' column not found in dataset {selected_variable}")
-        return pd.DataFrame()
-    hex_df = df[['hex9', 'value']].copy()
-    # Apply colormap
-    apply_color_mapping(hex_df, 'value', COLORMAP)
-    return hex_df
-
 # Main Streamlit app logic
 def main():
-    st.set_page_config(page_title="Geschiktheidsanalyse Nieuwbouw", layout="wide")
+    st.set_page_config(page_title="Geschiktheidsanalyse Industriegebieden", layout="wide")
 
     # Define the selected CSV files
     selected_csvs = [
@@ -343,7 +378,7 @@ def main():
 
     # Display UI
     display_intro_text()
-    display_csv_selection(dataframes)
+    display_all_datasets(dataframes)  # Use the updated function here
     perform_suitability_analysis_on_stack(dataframes, idx)
 
 if __name__ == "__main__":

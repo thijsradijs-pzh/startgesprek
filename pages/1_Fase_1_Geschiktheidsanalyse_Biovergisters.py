@@ -288,9 +288,9 @@ def initialize_session_state(idx):
 
 # Display introductory text
 def display_intro_text():
-    st.markdown("### Geschiktheidsanalyse voor Nieuwbouw Projecten")
+    st.markdown("### Geschiktheidsanalyse voor Biovergisters")
     st.markdown("""
-Welkom bij de **Geschiktheidsanalyse voor Nieuwbouw Projecten**! Met deze tool kun je locaties vinden die het meest geschikt zijn voor nieuwe bouwprojecten, gebaseerd op verschillende criteria.
+Welkom bij de **Geschiktheidsanalyse voor Biovergisters**! Met deze tool kun je locaties vinden die het meest geschikt zijn voor nieuwe bouwprojecten, gebaseerd op verschillende criteria.
 
 ### Hoe werkt het?
 
@@ -333,7 +333,7 @@ def update_layer(selected_variable, all_dataframes):
 
 # Main Streamlit app logic
 def main():
-    st.set_page_config(page_title="Geschiktheidsanalyse Nieuwbouw", layout="wide")
+    st.set_page_config(page_title="Geschiktheidsanalyse Biovergisters", layout="wide")
 
     # Define the selected CSV files
     selected_csvs = [
