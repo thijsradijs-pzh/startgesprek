@@ -181,7 +181,7 @@ def generate_pydeck(df=None, selected_hexagons=None, view_state=VIEW_STATE):
             extruded=False,
             opacity=0.9,
             get_hexagon="hex9",
-            get_fill_color=[255, 0, 0],  # Red color for selected hexagons
+            get_fill_color=[142, 152, 100],  # Red color for selected hexagons
         )
         layers.append(selected_hex_layer)
     
@@ -450,7 +450,8 @@ def main():
     selected_csvs = [
         'natuur_zh_delta',
         'water_zh_delta',
-        'akkerboeren_zh_delta'
+        'akkerboeren_zh_delta', 
+        'Stad'
     ]
 
     # Load data
