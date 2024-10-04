@@ -1,4 +1,4 @@
-# startgesprek[![DOI](https://zenodo.org/badge/682611837.svg)](https://zenodo.org/doi/10.5281/zenodo.10782927)
+[![DOI](https://zenodo.org/badge/682611837.svg)](https://zenodo.org/doi/10.5281/zenodo.10782927)
 
 # Startgesprek
 ## Multi criteria analyse, Een interactieve tool
