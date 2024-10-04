@@ -25,4 +25,5 @@ Aan het einde van deze fase leer je de kosten en baten van verschillende scenari
 De tool ondersteunt een iteratief leerproces, waarmee gebruikers hun scenario’s kunnen verfijnen en aanpassen om beter te voldoen aan strategische doelen.
 
 ![Twee Fasen](./two_phase.png)
+
 Deze tool is ontwikkeld voor Data Gedreven werken binnen het Provincie Zuid Holland Programma Landelijk Gebied. Het bouwt verder op het al bestaande BIOZE project. BIOZE is ontwikkeld voor het EU Interreg Project: BIOmass skills for Net Zero (BIOZE), door de Faculteit Geo-Informatie Wetenschap en Aardobservatie (ITC) van de Universiteit Twente.
