@@ -244,7 +244,7 @@ def perform_suitability_analysis_on_stack(dataframes, idx):
     clean_names_map = {clean_dataset_name(name): name for name in dataframes.keys()}
 
     with st.sidebar.form("suitability_analysis_form"):
-        st.header("Selecteer Criteria voor Industriegebieden")
+        st.header("Selecteer Criteria voor Gezamenlijke Wasplaatsen")
 
         # Combine all dataset names into a single list
         clean_dataset_names = [clean_dataset_name(ds) for ds in dataframes.keys()]
