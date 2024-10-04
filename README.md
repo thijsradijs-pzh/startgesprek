@@ -7,7 +7,6 @@ Over de tool...
 Voor de duidelijkheid: deze tool is bedoelt als startgesprek voor verschillende stakeholders, niet als leidend in besluitvorming. De tool bestaat uit een tweestaps leerproces om gebruikers te betrekken bij het leren over de voordelen en afwegingen van een bepaald scenario.
 
 Klik [hier](https://startgesprekpzh.streamlit.app/) om de tool te openen: 
-Hoe de tool te gebruiken...
 
 # :compass: Hoe de tool te gebruiken
 
